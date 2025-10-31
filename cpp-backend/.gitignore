@@ -1,0 +1,16 @@
+# Build artifacts
+*.o
+*.out
+cryption
+encrypt_decrypt
+build/
+
+# IDE settings
+.vscode/
+
+# Environment files (if sensitive)
+# .env
+
+# System files
+.DS_Store
+*~
