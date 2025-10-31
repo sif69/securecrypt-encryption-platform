@@ -1,0 +1,125 @@
+Ah! “**Unexpected end of JSON input**” is a very common error in Node.js/JavaScript when working with JSON, and it usually comes from **parsing incomplete or invalid JSON**. Let me break it down carefully.
+
+---
+
+## 1️⃣ What this error means
+
+When you see:
+
+```
+SyntaxError: Unexpected end of JSON input
+```
+
+It usually happens at this line:
+
+```js
+JSON.parse(someString)
+```
+
+It means:
+
+> `someString` is empty (`""`) or incomplete (`"{ "key": "`), so `JSON.parse` can’t convert it to an object.
+
+---
+
+## 2️⃣ Common causes
+
+1. **Empty request body** in an Express POST request:
+
+   ```js
+   app.post('/api', (req, res) => {
+       const data = JSON.parse(req.body); // ❌ fails if body is empty
+   });
+   ```
+
+   * Happens if the client doesn’t send JSON or the headers are missing.
+   * Happens if `express.json()` middleware isn’t used.
+
+2. **Malformed JSON from client**:
+
+   ```js
+   fetch('/api', { body: "text instead of JSON", headers: { 'Content-Type': 'application/json' } })
+   ```
+
+3. **Reading from a file or network response** that’s empty or truncated:
+
+   ```js
+   const fileContent = fs.readFileSync('some.json', 'utf8');
+   const obj = JSON.parse(fileContent); // ❌ fails if file empty
+   ```
+
+---
+
+## 3️⃣ How to fix it
+
+### ✅ A. Ensure JSON middleware is enabled in Express
+
+At the top of `index.js`:
+
+```js
+app.use(express.json()); // parses incoming JSON requests
+```
+
+You already have this in your code — good! ✅
+
+---
+
+### ✅ B. Validate the request body before parsing
+
+Instead of blindly parsing:
+
+```js
+app.post('/api/example', (req, res) => {
+    if (!req.body || Object.keys(req.body).length === 0) {
+        return res.status(400).json({ error: 'Empty or invalid JSON' });
+    }
+    const { key } = req.body;
+});
+```
+
+---
+
+### ✅ C. Wrap JSON.parse in try/catch (if reading raw data)
+
+```js
+let data;
+try {
+    data = JSON.parse(someString);
+} catch (err) {
+    console.error("Invalid JSON:", err.message);
+    return res.status(400).json({ error: "Malformed JSON" });
+}
+```
+
+---
+
+### ✅ D. Ensure clients send proper JSON
+
+Example with `fetch`:
+
+```js
+fetch('/api/encrypt-text', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ text: "hello", key: "1234" })
+});
+```
+
+**Common mistake**: sending plain text without `JSON.stringify()` or without the header `Content-Type: application/json`.
+
+---
+
+### 🔹 Summary
+
+| Cause                       | Fix                                        |
+| --------------------------- | ------------------------------------------ |
+| Empty request body          | Check `req.body` before parsing            |
+| Malformed JSON              | Wrap `JSON.parse` in try/catch             |
+| Client not sending JSON     | Ensure `JSON.stringify()` & proper headers |
+| File/network response empty | Validate content before `JSON.parse`       |
+
+---
+
+If you want, I can show you a **robust pattern for your `/api/encrypt-text` and `/api/decrypt-text` routes** that avoids both `ENOENT` **and** “Unexpected end of JSON input” errors at the same time.
+
+Do you want me to do that?
