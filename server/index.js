@@ -9,8 +9,11 @@ const crypto = require('crypto');
 const app = express();
 const PORT = 5000;
 
+// Define a temporary directory that is writable
+const tempDir = process.env.NODE_ENV === 'production' ? '/tmp' : 'temp';
+
 // Ensure required directories exist
-const requiredDirs = ['temp', 'uploads'];
+const requiredDirs = ['uploads', tempDir];
 requiredDirs.forEach(dir => {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
@@ -40,7 +43,7 @@ function executeEncryption(inputFile, outputFile, action, key) {
   return new Promise((resolve, reject) => {
     const binaryPath = path.join(__dirname, '..', 'cpp-backend', 'web_cryption');
     const args = [inputFile, outputFile, action, String(key)];
-    
+
     execFile(binaryPath, args, (error, stdout, stderr) => {
       if (error) {
         console.error('Encryption error:', error);
@@ -56,13 +59,13 @@ function executeEncryption(inputFile, outputFile, action, key) {
 app.post('/api/encrypt-text', async (req, res) => {
   try {
     const { text, key } = req.body;
-    
+
     if (!text || key === undefined || key === null || key === '') {
       return res.status(400).json({ error: 'Text and encryption key are required' });
     }
 
-    const inputFile = path.join('temp', `input-${Date.now()}-${crypto.randomBytes(6).toString('hex')}.txt`);
-    const outputFile = path.join('temp', `output-${Date.now()}-${crypto.randomBytes(6).toString('hex')}.txt`);
+    const inputFile = path.join(tempDir, `input-${Date.now()}-${crypto.randomBytes(6).toString('hex')}.txt`);
+    const outputFile = path.join(tempDir, `output-${Date.now()}-${crypto.randomBytes(6).toString('hex')}.txt`);
 
     fs.writeFileSync(inputFile, text, 'utf8');
 
@@ -89,13 +92,13 @@ app.post('/api/encrypt-text', async (req, res) => {
 app.post('/api/decrypt-text', async (req, res) => {
   try {
     const { encryptedText, key } = req.body;
-    
+
     if (!encryptedText || key === undefined || key === null || key === '') {
       return res.status(400).json({ error: 'Encrypted text and decryption key are required' });
     }
 
-    const inputFile = path.join('temp', `input-${Date.now()}-${crypto.randomBytes(6).toString('hex')}.txt`);
-    const outputFile = path.join('temp', `output-${Date.now()}-${crypto.randomBytes(6).toString('hex')}.txt`);
+    const inputFile = path.join(tempDir, `input-${Date.now()}-${crypto.randomBytes(6).toString('hex')}.txt`);
+    const outputFile = path.join(tempDir, `output-${Date.now()}-${crypto.randomBytes(6).toString('hex')}.txt`);
 
     const encryptedBuffer = Buffer.from(encryptedText, 'base64');
     fs.writeFileSync(inputFile, encryptedBuffer);
@@ -126,18 +129,18 @@ app.post('/api/encrypt-file', upload.single('file'), async (req, res) => {
     }
 
     const { key } = req.body;
-    
+
     if (key === undefined || key === null || key === '') {
       fs.unlinkSync(req.file.path);
       return res.status(400).json({ error: 'Encryption key is required' });
     }
 
-    const outputFile = path.join('temp', `encrypted-${Date.now()}-${crypto.randomBytes(6).toString('hex')}-${req.file.originalname}`);
+    const outputFile = path.join(tempDir, `encrypted-${Date.now()}-${crypto.randomBytes(6).toString('hex')}-${req.file.originalname}`);
 
     await executeEncryption(req.file.path, outputFile, 'encrypt', key);
 
     const encryptedData = fs.readFileSync(outputFile);
-    
+
     fs.unlinkSync(req.file.path);
     fs.unlinkSync(outputFile);
 
@@ -165,19 +168,19 @@ app.post('/api/decrypt-file', upload.single('file'), async (req, res) => {
     }
 
     const { key } = req.body;
-    
+
     if (key === undefined || key === null || key === '') {
       fs.unlinkSync(req.file.path);
       return res.status(400).json({ error: 'Decryption key is required' });
     }
 
     const originalName = req.file.originalname.replace(/^encrypted-/, '');
-    const outputFile = path.join('temp', `decrypted-${Date.now()}-${crypto.randomBytes(6).toString('hex')}-${originalName}`);
+    const outputFile = path.join(tempDir, `decrypted-${Date.now()}-${crypto.randomBytes(6).toString('hex')}-${originalName}`);
 
     await executeEncryption(req.file.path, outputFile, 'decrypt', key);
 
     const decryptedData = fs.readFileSync(outputFile);
-    
+
     fs.unlinkSync(req.file.path);
     fs.unlinkSync(outputFile);
 
