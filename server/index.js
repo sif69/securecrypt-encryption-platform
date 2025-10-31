@@ -9,11 +9,12 @@ const crypto = require('crypto');
 const app = express();
 const PORT = 5000;
 
-// Define a temporary directory that is writable
+// Define temporary directories that are writable
 const tempDir = process.env.NODE_ENV === 'production' ? '/tmp' : 'temp';
+const uploadsDir = process.env.NODE_ENV === 'production' ? '/tmp/uploads' : 'uploads';
 
 // Ensure required directories exist
-const requiredDirs = ['uploads', tempDir];
+const requiredDirs = [tempDir, uploadsDir];
 requiredDirs.forEach(dir => {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
@@ -26,7 +27,7 @@ app.use(express.static('public'));
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/');
+    cb(null, uploadsDir);
   },
   filename: (req, file, cb) => {
     const uniqueName = `${Date.now()}-${crypto.randomBytes(6).toString('hex')}-${file.originalname}`;
