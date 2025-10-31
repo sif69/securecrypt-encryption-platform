@@ -28,7 +28,17 @@ requiredDirs.forEach(dir => {
 });
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({
+  verify: (req, res, buf, encoding) => {
+    try {
+      JSON.parse(buf);
+    } catch (e) {
+      console.error('Invalid JSON received:', e.message);
+      console.error('Body:', buf.toString());
+      throw new Error('Invalid JSON');
+    }
+  }
+}));
 app.use(express.static('public'));
 
 const storage = multer.diskStorage({
