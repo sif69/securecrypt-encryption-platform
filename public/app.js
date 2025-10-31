@@ -1,4 +1,5 @@
-const API_URL = '';
+// Automatically detect API URL based on environment
+const API_URL = window.location.origin;
 
 function setupDropZone(dropZoneId, fileInputId, fileNameDisplayId) {
     const dropZone = document.getElementById(dropZoneId);
@@ -73,6 +74,11 @@ async function encryptText() {
             body: JSON.stringify({ text, key })
         });
 
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Server error (${response.status}): ${errorText}`);
+        }
+
         const data = await response.json();
 
         if (data.success) {
@@ -126,6 +132,11 @@ async function decryptText() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ encryptedText, key })
         });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Server error (${response.status}): ${errorText}`);
+        }
 
         const data = await response.json();
 

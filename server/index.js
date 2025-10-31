@@ -27,7 +27,10 @@ requiredDirs.forEach(dir => {
   }
 });
 
-app.use(cors());
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
 app.use(express.json({
   verify: (req, res, buf, encoding) => {
     try {
@@ -204,6 +207,14 @@ app.post('/api/decrypt-file', upload.single('file'), async (req, res) => {
     }
     res.status(500).json({ error: 'Failed to decrypt file: ' + error.message });
   }
+});
+
+app.get('/', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    message: 'SecureCrypt API is running',
+    engine: 'Node.js encryption (serverless-compatible)'
+  });
 });
 
 app.get('/health', (req, res) => {
