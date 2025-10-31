@@ -5,7 +5,11 @@
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",
-    "dev": "node server/index.js"
+    "dev": "node server/index.js",
+    "build": "cd cpp-backend && g++ -std=c++17 -o web_cryption web_cryption.cpp"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "keywords": [
     "encryption",
