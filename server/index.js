@@ -1,10 +1,10 @@
 const express = require('express');
 const multer = require('multer');
 const cors = require('cors');
-const { execFile } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
+const { processFile } = require('./encryption');
 
 const app = express();
 const PORT = 5000;
@@ -57,32 +57,8 @@ const upload = multer({
 });
 
 function executeEncryption(inputFile, outputFile, action, key) {
-  return new Promise((resolve, reject) => {
-    const binaryPath = path.join(__dirname, '..', 'cpp-backend', 'web_cryption');
-    
-    // Check if binary exists
-    if (!fs.existsSync(binaryPath)) {
-      const error = `C++ binary not found at: ${binaryPath}. Please ensure it's compiled.`;
-      console.error(error);
-      reject(new Error(error));
-      return;
-    }
-    
-    const args = [inputFile, outputFile, action, String(key)];
-    console.log('Executing binary:', binaryPath, 'with args:', args);
-
-    execFile(binaryPath, args, (error, stdout, stderr) => {
-      if (error) {
-        console.error('Encryption error:', error);
-        console.error('stderr:', stderr);
-        console.error('Binary path:', binaryPath);
-        console.error('Args:', args);
-        reject(new Error(stderr || error.message));
-        return;
-      }
-      resolve(stdout);
-    });
-  });
+  console.log('Processing file:', { inputFile, outputFile, action, key });
+  return processFile(inputFile, outputFile, action, key);
 }
 
 app.post('/api/encrypt-text', async (req, res) => {
@@ -237,14 +213,5 @@ app.get('/health', (req, res) => {
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Access the application at http://0.0.0.0:${PORT}`);
-  
-  // Check if C++ binary exists
-  const binaryPath = path.join(__dirname, '..', 'cpp-backend', 'web_cryption');
-  if (fs.existsSync(binaryPath)) {
-    console.log('✓ C++ encryption binary found at:', binaryPath);
-  } else {
-    console.error('✗ WARNING: C++ encryption binary NOT found at:', binaryPath);
-    console.error('  Encryption/decryption will fail until binary is compiled.');
-    console.error('  Run: cd cpp-backend && g++ -std=c++17 -o web_cryption web_cryption.cpp');
-  }
+  console.log('✓ Using Node.js encryption engine (serverless-compatible)');
 });
