@@ -201,8 +201,15 @@ async function encryptFile() {
                 </div>
             `;
         } else {
-            const data = await response.json();
-            throw new Error(data.error || 'File encryption failed');
+            let errorMessage = 'File encryption failed';
+            try {
+                const data = await response.json();
+                errorMessage = data.error || errorMessage;
+            } catch (e) {
+                const text = await response.text();
+                errorMessage = text || `Server error (${response.status})`;
+            }
+            throw new Error(errorMessage);
         }
     } catch (error) {
         resultDiv.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> ${error.message}</div>`;
@@ -259,8 +266,15 @@ async function decryptFile() {
                 </div>
             `;
         } else {
-            const data = await response.json();
-            throw new Error(data.error || 'File decryption failed');
+            let errorMessage = 'File decryption failed';
+            try {
+                const data = await response.json();
+                errorMessage = data.error || errorMessage;
+            } catch (e) {
+                const text = await response.text();
+                errorMessage = text || `Server error (${response.status})`;
+            }
+            throw new Error(errorMessage);
         }
     } catch (error) {
         resultDiv.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> ${error.message}</div>`;
