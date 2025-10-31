@@ -37,4 +37,4 @@ externalPort = 80
 [deployment]
 deploymentTarget = "autoscale"
 run = ["sh", "-c", "node server/index.js"]
-build = ["sh", "-c", "cd cpp-backend && g++ -std=c++17 -o web_cryption web_cryption.cpp"]
+build = ["sh", "-c", "cd cpp-backend && g++ -std=c++17 -o web_cryption web_cryption.cpp && chmod +x web_cryption && ls -la web_cryption"]
