@@ -1,0 +1,11 @@
+node_modules/
+uploads/*
+!uploads/.gitkeep
+temp/*
+!temp/.gitkeep
+*.log
+.env
+.DS_Store
+cpp-backend/*.o
+cpp-backend/encrypt_decrypt
+cpp-backend/cryption
