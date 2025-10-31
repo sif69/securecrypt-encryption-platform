@@ -1,7 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const cors = require('cors');
-const { exec } = require('child_process');
+const { execFile } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
@@ -30,9 +30,10 @@ const upload = multer({
 
 function executeEncryption(inputFile, outputFile, action, key) {
   return new Promise((resolve, reject) => {
-    const command = `./cpp-backend/web_cryption "${inputFile}" "${outputFile}" "${action}" "${key}"`;
+    const binaryPath = path.join(__dirname, '..', 'cpp-backend', 'web_cryption');
+    const args = [inputFile, outputFile, action, String(key)];
     
-    exec(command, (error, stdout, stderr) => {
+    execFile(binaryPath, args, (error, stdout, stderr) => {
       if (error) {
         console.error('Encryption error:', error);
         console.error('stderr:', stderr);
