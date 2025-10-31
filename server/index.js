@@ -9,6 +9,14 @@ const crypto = require('crypto');
 const app = express();
 const PORT = 5000;
 
+// Ensure required directories exist
+const requiredDirs = ['temp', 'uploads'];
+requiredDirs.forEach(dir => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+});
+
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
