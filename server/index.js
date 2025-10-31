@@ -9,9 +9,15 @@ const crypto = require('crypto');
 const app = express();
 const PORT = 5000;
 
+// Detect if we're in a serverless/deployment environment
+// Replit deployments use /var/task, and filesystem is read-only except /tmp
+const isDeployment = process.env.REPLIT_DEPLOYMENT === '1' || 
+                      process.cwd().startsWith('/var/task') ||
+                      process.env.NODE_ENV === 'production';
+
 // Define temporary directories that are writable
-const tempDir = process.env.NODE_ENV === 'production' ? '/tmp' : 'temp';
-const uploadsDir = process.env.NODE_ENV === 'production' ? '/tmp/uploads' : 'uploads';
+const tempDir = isDeployment ? '/tmp' : 'temp';
+const uploadsDir = isDeployment ? '/tmp/uploads' : 'uploads';
 
 // Ensure required directories exist
 const requiredDirs = [tempDir, uploadsDir];
