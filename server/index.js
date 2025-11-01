@@ -7,7 +7,7 @@ const crypto = require('crypto');
 const { processFile } = require('./encryption');
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 // Detect if we're in a serverless/deployment environment
 // Replit deployments use /var/task, and filesystem is read-only except /tmp
@@ -221,8 +221,14 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'Server is running' });
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Access the application at http://0.0.0.0:${PORT}`);
-  console.log('✓ Using Node.js encryption engine (serverless-compatible)');
-});
+// Export the app so it can be used by serverless handlers (Vercel) or started directly
+module.exports = app;
+
+// If this file is run directly (node server/index.js), start the HTTP server normally
+if (require.main === module) {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log(`Access the application at http://0.0.0.0:${PORT}`);
+    console.log('✓ Using Node.js encryption engine (serverless-compatible)');
+  });
+}
