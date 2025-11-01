@@ -47,12 +47,11 @@ function hideLoading(buttonElement, originalText) {
     buttonElement.innerHTML = originalText;
 }
 
-async function encryptText() {
+async function encryptText(button) {
     const text = document.getElementById('encryptTextInput').value;
     const key = document.getElementById('encryptTextKey').value;
     const resultDiv = document.getElementById('encryptTextResult');
-    const button = event.target;
-    const originalText = button.innerHTML;
+    const originalText = button ? button.innerHTML : 'Encrypt Message';
 
     if (!text.trim()) {
         resultDiv.innerHTML = '<div class="alert alert-warning">Please enter some text to encrypt</div>';
@@ -106,12 +105,11 @@ async function encryptText() {
     }
 }
 
-async function decryptText() {
+async function decryptText(button) {
     const encryptedText = document.getElementById('decryptTextInput').value;
     const key = document.getElementById('decryptTextKey').value;
     const resultDiv = document.getElementById('decryptTextResult');
-    const button = event.target;
-    const originalText = button.innerHTML;
+    const originalText = button ? button.innerHTML : 'Decrypt Message';
 
     if (!encryptedText.trim()) {
         resultDiv.innerHTML = '<div class="alert alert-warning">Please paste the encrypted message</div>';
@@ -164,12 +162,11 @@ async function decryptText() {
     }
 }
 
-async function encryptFile() {
+async function encryptFile(button) {
     const fileInput = document.getElementById('encryptFileInput');
     const key = document.getElementById('encryptFileKey').value;
     const resultDiv = document.getElementById('encryptFileResult');
-    const button = event.target;
-    const originalText = button.innerHTML;
+    const originalText = button ? button.innerHTML : 'Encrypt File';
 
     if (!fileInput.files || fileInput.files.length === 0) {
         resultDiv.innerHTML = '<div class="alert alert-warning">Please select a file to encrypt</div>';
@@ -229,12 +226,11 @@ async function encryptFile() {
     }
 }
 
-async function decryptFile() {
+async function decryptFile(button) {
     const fileInput = document.getElementById('decryptFileInput');
     const key = document.getElementById('decryptFileKey').value;
     const resultDiv = document.getElementById('decryptFileResult');
-    const button = event.target;
-    const originalText = button.innerHTML;
+    const originalText = button ? button.innerHTML : 'Decrypt File';
 
     if (!fileInput.files || fileInput.files.length === 0) {
         resultDiv.innerHTML = '<div class="alert alert-warning">Please select an encrypted file</div>';

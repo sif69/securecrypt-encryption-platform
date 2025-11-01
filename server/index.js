@@ -31,6 +31,12 @@ app.use(cors({
   origin: true,
   credentials: true
 }));
+
+// Simple request logger for debugging (prints method and path)
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} -> ${req.method} ${req.originalUrl}`);
+  next();
+});
 app.use(express.json({
   verify: (req, res, buf, encoding) => {
     try {
