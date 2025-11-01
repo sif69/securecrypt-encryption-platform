@@ -99,6 +99,7 @@ async function encryptText(button) {
             throw new Error(data.error || 'Encryption failed');
         }
     } catch (error) {
+        console.error('encryptText error', error);
         resultDiv.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> ${error.message}</div>`;
     } finally {
         hideLoading(button, originalText);
@@ -156,6 +157,7 @@ async function decryptText(button) {
             throw new Error(data.error || 'Decryption failed');
         }
     } catch (error) {
+        console.error('decryptText error', error);
         resultDiv.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> ${error.message}</div>`;
     } finally {
         hideLoading(button, originalText);
@@ -220,7 +222,8 @@ async function encryptFile(button) {
             throw new Error(errorMessage);
         }
     } catch (error) {
-        resultDiv.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> ${error.message}</div>`;
+            console.error('encryptFile error', error);
+            resultDiv.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> ${error.message}</div>`;
     } finally {
         hideLoading(button, originalText);
     }
@@ -284,7 +287,8 @@ async function decryptFile(button) {
             throw new Error(errorMessage);
         }
     } catch (error) {
-        resultDiv.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> ${error.message}</div>`;
+            console.error('decryptFile error', error);
+            resultDiv.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> ${error.message}</div>`;
     } finally {
         hideLoading(button, originalText);
     }
