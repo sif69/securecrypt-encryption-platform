@@ -10,7 +10,7 @@
     "vercel-build": "echo 'Vercel build - no special steps'"
   },
   "engines": {
-    "node": "22.x"
+    "node": "20.x"
   },
   "keywords": [
     "encryption",
